@@ -1,0 +1,34 @@
+{
+  "tutorial": {
+    "welcome": "Welcome to Sights, an app designed to help you understand what's around you. To get started, tap anywhere on the screen.",
+    "takePhoto": "To take a picture, simply tap once anywhere on the screen. The app will automatically capture and analyze what's in front of you.",
+    "adjustVolume": "Use your device's volume buttons to adjust the volume.",
+    "adjustSpeed": "To change the reading speed, slide your finger up or down on the screen.",
+    "retake": "While viewing results, to stop reading, tap the screen, to retake a picture, double tap the screen. Let's get started!",
+    "step": "Step {{step}} of {{total}}",
+    "tapToContinue": "Tap anywhere to continue"
+  },
+  "camera": {
+    "ready": "Camera is ready. Tap anywhere on the screen to take a picture.",
+    "denied": "Camera permission was denied. This app requires camera access to function properly.",
+    "taking": "Taking picture...",
+    "failed": "Failed to take picture. Please try again.",
+    "cancelled": "Picture taking was cancelled. Tap again to take a picture.",
+    "requestingPermission": "Requesting camera permission...",
+    "noAccess": "No access to camera",
+    "grantPermission": "Please grant camera permission in settings to use this app.",
+    "tapToTake": "Tap anywhere to take a picture",
+    "processing": "Processing..."
+  },
+  "result": {
+    "analyzing": "Analyzing image...",
+    "imageDescription": "Image Description",
+    "doubleTapRetake": "Double tap to take another picture",
+    "errorAnalyzing": "Sorry, there was an error analyzing the image. Please try again.",
+    "speed": "Speed: {{value}}x",
+    "paused": "Reading stopped"
+  },
+  "common": {
+    "appName": "Sights"
+  }
+} 

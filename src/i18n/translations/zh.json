@@ -1,0 +1,34 @@
+{
+  "tutorial": {
+    "welcome": "欢迎使用视觉，这款应用旨在帮助您理解周围的环境。要开始使用，请点击屏幕任意位置。",
+    "takePhoto": "拍照时，只需点击屏幕上的任意位置。应用会自动捕捉并分析您面前的景物。",
+    "adjustVolume": "使用设备音量按钮调整音量。",
+    "adjustSpeed": "要更改阅读速度，请在屏幕上上下滑动手指。",
+    "retake": "查看结果时，单击屏幕停止朗读，双击屏幕可以重新拍照。让我们开始吧！",
+    "step": "第 {{step}} 步，共 {{total}} 步",
+    "tapToContinue": "点击任意位置继续"
+  },
+  "camera": {
+    "ready": "相机已准备好。点击屏幕任意位置拍照。",
+    "denied": "相机权限被拒绝。此应用需要相机访问权限才能正常工作。",
+    "taking": "正在拍照...",
+    "failed": "拍照失败。请再试一次。",
+    "cancelled": "拍照已取消。再次点击拍照。",
+    "requestingPermission": "请求相机权限中...",
+    "noAccess": "无法访问相机",
+    "grantPermission": "请在设置中授予相机权限以使用此应用。",
+    "tapToTake": "点击任意位置拍照",
+    "processing": "处理中..."
+  },
+  "result": {
+    "analyzing": "正在分析图像...",
+    "imageDescription": "图像描述",
+    "doubleTapRetake": "双击重新拍照",
+    "errorAnalyzing": "抱歉，分析图像时出错。请再试一次。",
+    "speed": "速度: {{value}}x",
+    "paused": "朗读已停止"
+  },
+  "common": {
+    "appName": "视觉"
+  }
+} 
