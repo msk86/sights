@@ -18,7 +18,7 @@ export default function App() {
     const setup = async () => {
       try {
         await initSpeech();
-        await trackAppOpen();
+        await trackAppOpen(); 
         console.log('App initialized');
       } catch (error) {
         console.error('Failed to initialize app:', error);
