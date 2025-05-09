@@ -25,6 +25,7 @@
     "imageDescription": "Image Description",
     "doubleTapRetake": "Double tap to take another picture",
     "errorAnalyzing": "Sorry, there was an error analyzing the image. Please try again.",
+    "selectSpeed": "Select Speed",
     "speed": "Speed: {{value}}x",
     "paused": "Reading stopped",
     "autoRead": "Auto Read",

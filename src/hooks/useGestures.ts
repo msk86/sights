@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { PanResponder } from 'react-native';
 import { getSpeechRate, setSpeechRate, getMaxSpeechRate } from '../services/speech';
+import { trackSpeedPreference } from '../services/analytics';
 
 // Speed control sensitivity - higher values = less sensitive
-const RATE_SENSITIVITY = 150;
+const RATE_SENSITIVITY = 100;
 
 type GestureControlType = {
   rate: number;    // 0.5 to 10
@@ -65,6 +66,7 @@ export const useGestures = () => {
     },
     onPanResponderRelease: () => {
       // Save final reading speed
+      trackSpeedPreference(controls.rate, 'scroll');
       setSpeechRate(controls.rate);
     }
   });

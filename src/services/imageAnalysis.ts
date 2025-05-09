@@ -1,7 +1,7 @@
 import { isChineseLocale } from '../i18n';
 import { analyzeImage as analyzeWithOpenAI } from './openai';
 import { analyzeImage as analyzeWithQwen } from './qwen';
-
+import { trackLLM } from './analytics';
 // Base64 encode an image for API submission
 export const encodeImageToBase64 = async (uri: string): Promise<string> => {
   try {
@@ -24,6 +24,7 @@ export const encodeImageToBase64 = async (uri: string): Promise<string> => {
 
 export const analyzeImage = async (imageUri: string): Promise<string> => {
   const base64Image = await encodeImageToBase64(imageUri);
+  trackLLM(isChineseLocale() ? 'qwen' : 'openai');
   if (isChineseLocale()) {
     return analyzeWithQwen(base64Image);
   } else {

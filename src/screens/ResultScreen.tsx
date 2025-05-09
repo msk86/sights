@@ -9,7 +9,7 @@ import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } fr
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { trackAutoReadPreference } from '../services/analytics';
+import { trackAutoReadPreference, trackDonateClick, trackSpeedPreference } from '../services/analytics';
 
 // --- Types ---
 type ResultScreenProps = {
@@ -52,7 +52,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   // --- Save autoRead to storage when changed ---
   useEffect(() => {
     AsyncStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
-    trackAutoReadPreference(autoRead);
   }, [autoRead]);
 
   // --- Initialize speech service and load saved rate ---
@@ -155,6 +154,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
 
   const handleSpeedSelect = (rate: number) => {
     setShowSpeedModal(false);
+    trackSpeedPreference(rate, 'button');
     setRate(rate);
     setIsStopped(false);
     // Do not trigger reading here; let the effect handle it
@@ -207,7 +207,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
             <Switch
               value={autoRead}
-              onValueChange={setAutoRead}
+              onValueChange={(value) => {
+                trackAutoReadPreference(value);
+                setAutoRead(value);
+              }}
               thumbColor={autoRead ? '#4caf50' : '#ccc'}
               trackColor={{ false: '#888', true: '#a5d6a7' }}
             />
@@ -231,7 +234,10 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       {/* Donate Button - bottom center */}
       <TouchableOpacity
         style={styles.donateButton}
-        onPress={() => nav.navigate('Donate' as never)}
+        onPress={() => {
+          trackDonateClick();
+          return nav.navigate('Donate' as never);
+        }}
         activeOpacity={0.85}
       >
         <Text style={styles.donateButtonText}>❤️ {i18n.t('result.donate')} ❤️</Text>
@@ -245,7 +251,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       >
         <Pressable style={styles.modalOverlay} onPress={() => setShowSpeedModal(false)}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Reading Speed</Text>
+            <Text style={styles.modalTitle}>{i18n.t('result.selectSpeed')}</Text>
             {speedOptions.map(opt => (
               <TouchableOpacity
                 key={i18n.t('result.speed', { value: opt.value })}
