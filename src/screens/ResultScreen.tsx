@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { analyzeImage } from '../services/openai';
-import { speakText, stopSpeech, setSpeechRate, getSpeechRate, initSpeech } from '../services/speech';
+import { speakText, stopSpeech, setSpeechRate, getSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 
@@ -21,8 +21,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   const [lastTapTime, setLastTapTime] = useState(0);
   const [currentRate, setCurrentRate] = useState(getSpeechRate());
   const [isStopped, setIsStopped] = useState(false);
-  const { controls, panResponder } = useGestures();
+  const { controls, panResponder, setRate } = useGestures();
   const hasSpokenRef = useRef(false);
+  const [showSpeedModal, setShowSpeedModal] = useState(false);
+  const maxRate = getMaxSpeechRate();
+  const speedOptions = [
+    { value: 0.5 },
+    { value: 1.0 },
+    { value: (1.0 + maxRate) / 2 },
+    { value: maxRate },
+  ];
 
   // Initialize speech service and load saved rate
   useEffect(() => {
@@ -112,6 +120,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     setLastTapTime(currentTime);
   };
 
+  const handleSpeedSelect = (rate: number) => {
+    setShowSpeedModal(false);
+    setCurrentRate(rate);
+    setRate(rate);
+    setIsStopped(false);
+    if (description && hasSpokenRef.current) {
+      speakText(description);
+    }
+  };
+
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar style="light" />
@@ -138,9 +156,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
             
             <View style={styles.controlsInfo}>
-              <Text style={styles.controlText}>
-                {i18n.t('result.speed', { value: currentRate.toFixed(1) })}
-              </Text>
               {isStopped && (
                 <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
               )}
@@ -148,6 +163,36 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
           </>
         )}
       </TouchableOpacity>
+      {/* Floating Speed Button */}
+      <TouchableOpacity
+        style={styles.speedButton}
+        onPress={() => setShowSpeedModal(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: currentRate.toFixed(1)})}`}</Text>
+      </TouchableOpacity>
+      {/* Speed Selection Modal */}
+      <Modal
+        visible={showSpeedModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSpeedModal(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowSpeedModal(false)}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Reading Speed</Text>
+            {speedOptions.map(opt => (
+              <TouchableOpacity
+                key={i18n.t('result.speed', { value: opt.value })}
+                style={styles.speedOption}
+                onPress={() => handleSpeedSelect(opt.value)}
+              >
+                <Text style={styles.speedOptionText}>{`${i18n.t('result.speed', { value: opt.value })}`}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -219,6 +264,57 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 8,
+  },
+  speedButton: {
+    position: 'absolute',
+    bottom: 40,
+    right: 24,
+    backgroundColor: '#222',
+    borderRadius: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  speedButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    minWidth: 240,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#222',
+  },
+  speedOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginVertical: 4,
+    backgroundColor: '#f0f0f0',
+    width: '100%',
+    alignItems: 'center',
+  },
+  speedOptionText: {
+    fontSize: 16,
+    color: '#222',
   },
 });
 

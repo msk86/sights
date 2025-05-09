@@ -1,6 +1,7 @@
 import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCurrentLocale } from '../i18n';
+import { Platform } from 'react-native';
 
 // Cache for voice selection
 let bestEnglishVoice: string | null = null;
@@ -225,4 +226,11 @@ export const setSpeechRate = async (rate: number): Promise<void> => {
 // Get current speech rate
 export const getSpeechRate = (): number => {
   return currentSpeech.options.rate || defaultOptions.rate;
+};
+
+// Get the max speech rate for the current OS
+export const getMaxSpeechRate = (): number => {
+  if (Platform.OS === 'ios') return 2.0;
+  if (Platform.OS === 'android') return 10.0;
+  return 10.0;
 };
