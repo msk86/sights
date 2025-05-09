@@ -29,6 +29,14 @@
     "paused": "朗读已停止",
     "autoRead": "自动朗读"
   },
+  "donate": {
+    "title": "支持我们",
+    "subtitle": "每250次拍照，我们都需要支付约1元人民币，希望您能够支持这个App，感谢您的支持！",
+    "alipay": "支付宝",
+    "alipayHint": "请扫描二维码进行捐赠",
+    "paypal": "PayPal",
+    "paypalButton": "捐赠给视觉"
+  },
   "common": {
     "appName": "视觉"
   }

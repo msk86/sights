@@ -7,6 +7,7 @@ import { View, ActivityIndicator } from 'react-native';
 import TutorialScreen from '../screens/TutorialScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ResultScreen from '../screens/ResultScreen';
+import DonateScreen from '../screens/DonateScreen';
 
 // Import storage utilities
 import { hasTutorialBeenCompleted } from '../services/storage';
@@ -16,6 +17,7 @@ export type RootStackParamList = {
   Tutorial: undefined;
   Camera: undefined;
   Result: { imageUri: string; description?: string };
+  Donate: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -60,6 +62,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Tutorial" component={TutorialScreen} />
         <Stack.Screen name="Camera" component={CameraScreen} />
         <Stack.Screen name="Result" component={ResultScreen} />
+        <Stack.Screen name="Donate" component={DonateScreen} options={{ headerShown: true, title: 'Donate' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

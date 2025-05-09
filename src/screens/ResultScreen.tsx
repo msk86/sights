@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { analyzeImage } from '../services/openai';
 import { speakText, stopSpeech, setSpeechRate, getSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
@@ -37,6 +37,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     { value: (1.0 + maxRate) / 2 },
     { value: maxRate },
   ];
+  const nav = useNavigation();
 
   // --- Load autoRead from storage on mount ---
   useEffect(() => {
@@ -164,16 +165,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar style="light" />
-      {/* Auto Read Toggle - bottom left */}
-      <View style={styles.autoReadToggleContainer}>
-        <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
-        <Switch
-          value={autoRead}
-          onValueChange={setAutoRead}
-          thumbColor={autoRead ? '#4caf50' : '#ccc'}
-          trackColor={{ false: '#888', true: '#a5d6a7' }}
-        />
-      </View>
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUri }} style={styles.image} />
       </View>
@@ -193,21 +184,38 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             <Text style={styles.heading}>{i18n.t('result.imageDescription')}</Text>
             <Text style={styles.description}>{description}</Text>
             <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
-            <View style={styles.controlsInfo}>
-              {isStopped && (
-                <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
-              )}
-            </View>
           </>
         )}
       </TouchableOpacity>
-      {/* Floating Speed Button */}
+      {/* Controls Row: Toggle, Stopped Text, Speed Button */}
+      <View style={styles.controlsRow}>
+        <View style={styles.autoReadToggleContainer}>
+          <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
+          <Switch
+            value={autoRead}
+            onValueChange={setAutoRead}
+            thumbColor={autoRead ? '#4caf50' : '#ccc'}
+            trackColor={{ false: '#888', true: '#a5d6a7' }}
+          />
+        </View>
+        {isStopped && (
+          <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
+        )}
+        <TouchableOpacity
+          style={styles.speedButton}
+          onPress={() => setShowSpeedModal(true)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
+        </TouchableOpacity>
+      </View>
+      {/* Donate Button - bottom center */}
       <TouchableOpacity
-        style={styles.speedButton}
-        onPress={() => setShowSpeedModal(true)}
-        activeOpacity={0.8}
+        style={styles.donateButton}
+        onPress={() => nav.navigate('Donate' as never)}
+        activeOpacity={0.85}
       >
-        <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
+        <Text style={styles.donateButtonText}>❤️ Donate</Text>
       </TouchableOpacity>
       {/* Speed Selection Modal */}
       <Modal
@@ -287,27 +295,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  controlsInfo: {
+  controlsRow: {
     position: 'absolute',
-    bottom: 30,
-    left: 20,
-    right: 20,
+    left: 0,
+    right: 0,
+    bottom: 110,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 12,
   },
-  controlText: {
-    color: '#CCCCCC',
-    fontSize: 14,
+  autoReadToggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  autoReadLabel: {
+    color: '#fff',
+    fontSize: 16,
+    marginRight: 8,
+    fontWeight: 'bold',
   },
   stoppedText: {
     color: '#F0AD4E',
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 8,
+    marginHorizontal: 16,
   },
   speedButton: {
-    position: 'absolute',
-    bottom: 40,
-    right: 24,
     backgroundColor: '#222',
     borderRadius: 24,
     paddingVertical: 10,
@@ -322,6 +337,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  donateButton: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 11,
+  },
+  donateButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    backgroundColor: '#e91e63',
+    paddingVertical: 10,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   modalOverlay: {
     flex: 1,
@@ -354,20 +393,6 @@ const styles = StyleSheet.create({
   speedOptionText: {
     fontSize: 16,
     color: '#222',
-  },
-  autoReadToggleContainer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  autoReadLabel: {
-    color: '#fff',
-    fontSize: 16,
-    marginRight: 8,
-    fontWeight: 'bold',
   },
 });
 

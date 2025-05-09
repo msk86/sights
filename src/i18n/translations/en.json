@@ -29,6 +29,14 @@
     "paused": "Reading stopped",
     "autoRead": "Auto Read"
   },
+  "donate": {
+    "title": "Support Us",
+    "subtitle": "Every 1000 photos, we need to pay about 1 USD, hope you can support this app, thank you!",
+    "alipay": "Alipay",
+    "alipayHint": "Please scan the QR code to donate",
+    "paypal": "PayPal",
+    "paypalButton": "Donate to Sights"
+  },
   "common": {
     "appName": "Sights"
   }
