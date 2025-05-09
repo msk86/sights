@@ -23,7 +23,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   const { imageUri, description: initialDescription } = route.params;
   const [description, setDescription] = useState<string | null>(initialDescription || null);
   const [isLoading, setIsLoading] = useState(!initialDescription);
-  const [currentRate, setCurrentRate] = useState(getSpeechRate());
   const [isStopped, setIsStopped] = useState(false);
   const [showSpeedModal, setShowSpeedModal] = useState(false);
   const [autoRead, setAutoRead] = useState(true);
@@ -57,7 +56,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   useEffect(() => {
     const initializeSpeech = async () => {
       await initSpeech();
-      setCurrentRate(getSpeechRate());
     };
     initializeSpeech();
   }, []);
@@ -78,29 +76,34 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   // --- Update speech rate when controls change ---
   useEffect(() => {
     if (!autoReadLoaded) return;
-    if (controls.rate !== currentRate) {
-      setCurrentRate(controls.rate);
-      setSpeechRate(controls.rate);
-      if (autoRead && description && hasSpokenRef.current) {
-        setTimeout(() => {
-          setIsStopped(false);
-          trySpeak(description);
-        }, 50);
-      }
+    setSpeechRate(controls.rate);
+    // Always replay reading at new speed if autoRead is on and description is present
+    if (autoRead && description) {
+      setTimeout(() => {
+        setIsStopped(false);
+        speakText(description);
+        hasSpokenRef.current = true;
+      }, 50);
     }
   }, [controls.rate, description, autoRead, autoReadLoaded]);
 
   // --- React to autoRead toggle ---
   useEffect(() => {
     if (!autoReadLoaded) return;
-    if (autoRead && description && !isLoading) {
-      trySpeak(description);
-      setIsStopped(false);
+    if (autoRead && description && !isLoading && !isStopped) {
+      speakText(description);
+      hasSpokenRef.current = true;
     } else if (!autoRead) {
       stopSpeech();
       setIsStopped(true);
+      hasSpokenRef.current = false;
     }
-  }, [autoRead, autoReadLoaded, description, isLoading]);
+  }, [autoRead, autoReadLoaded, description, isLoading, isStopped]);
+
+  // --- Reset hasSpokenRef when description changes ---
+  useEffect(() => {
+    hasSpokenRef.current = false;
+  }, [description]);
 
   // --- Centralized speech logic ---
   const trySpeak = (text: string) => {
@@ -133,11 +136,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     const timeDiff = currentTime - lastTapTime;
     if (timeDiff < 300) {
       stopSpeech();
+      setIsStopped(true);
+      hasSpokenRef.current = false;
       navigation.navigate('Camera');
     } else {
-      if (description && hasSpokenRef.current) {
+      // Single tap - stop reading if currently playing
+      if (!isStopped) {
         await stopSpeech();
         setIsStopped(true);
+        hasSpokenRef.current = false;
       }
     }
     setLastTapTime(currentTime);
@@ -145,12 +152,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
 
   const handleSpeedSelect = (rate: number) => {
     setShowSpeedModal(false);
-    setCurrentRate(rate);
     setRate(rate);
     setIsStopped(false);
-    if (autoReadLoaded && autoRead && description && hasSpokenRef.current) {
-      trySpeak(description);
-    }
+    // Do not trigger reading here; let the effect handle it
   };
 
   // --- UI Guard: render nothing until autoReadLoaded ---
@@ -203,7 +207,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
         onPress={() => setShowSpeedModal(true)}
         activeOpacity={0.8}
       >
-        <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: currentRate.toFixed(1)})}`}</Text>
+        <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
       </TouchableOpacity>
       {/* Speed Selection Modal */}
       <Modal
