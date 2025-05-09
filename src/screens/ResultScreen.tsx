@@ -10,6 +10,7 @@ import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// --- Types ---
 type ResultScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Result'>;
   route: RouteProp<RootStackParamList, 'Result'>;
@@ -18,15 +19,18 @@ type ResultScreenProps = {
 const AUTO_READ_KEY = 'AUTO_READ_ENABLED';
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
+  // --- State ---
   const { imageUri, description: initialDescription } = route.params;
   const [description, setDescription] = useState<string | null>(initialDescription || null);
-  const [isLoading, setIsLoading] = useState(initialDescription ? false : true);
-  const [lastTapTime, setLastTapTime] = useState(0);
+  const [isLoading, setIsLoading] = useState(!initialDescription);
   const [currentRate, setCurrentRate] = useState(getSpeechRate());
   const [isStopped, setIsStopped] = useState(false);
-  const { controls, panResponder, setRate } = useGestures();
-  const hasSpokenRef = useRef(false);
   const [showSpeedModal, setShowSpeedModal] = useState(false);
+  const [autoRead, setAutoRead] = useState(true);
+  const [autoReadLoaded, setAutoReadLoaded] = useState(false);
+  const [lastTapTime, setLastTapTime] = useState(0);
+  const hasSpokenRef = useRef(false);
+  const { controls, panResponder, setRate } = useGestures();
   const maxRate = getMaxSpeechRate();
   const speedOptions = [
     { value: 0.5 },
@@ -34,112 +38,112 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     { value: (1.0 + maxRate) / 2 },
     { value: maxRate },
   ];
-  const [autoRead, setAutoRead] = useState(true);
 
-  // Initialize speech service and load saved rate
+  // --- Load autoRead from storage on mount ---
+  useEffect(() => {
+    (async () => {
+      const saved = await AsyncStorage.getItem(AUTO_READ_KEY);
+      if (saved !== null) setAutoRead(saved === 'true');
+      setAutoReadLoaded(true);
+    })();
+  }, []);
+
+  // --- Save autoRead to storage when changed ---
+  useEffect(() => {
+    AsyncStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
+  }, [autoRead]);
+
+  // --- Initialize speech service and load saved rate ---
   useEffect(() => {
     const initializeSpeech = async () => {
       await initSpeech();
       setCurrentRate(getSpeechRate());
     };
-    
     initializeSpeech();
   }, []);
 
-  // Load auto-read setting on mount
+  // --- Analyze image if no initial description ---
   useEffect(() => {
-    (async () => {
-      const saved = await AsyncStorage.getItem(AUTO_READ_KEY);
-      if (saved !== null) setAutoRead(saved === 'true');
-    })();
-  }, []);
-
-  // Save auto-read setting when changed
-  useEffect(() => {
-    AsyncStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
-  }, [autoRead]);
-
-  // Analyze the image when component mounts if no description provided
-  useEffect(() => {
+    if (!autoReadLoaded) return;
     if (!initialDescription) {
-      analyzeImageAndSpeak();
+      analyzeImageAndMaybeSpeak();
     } else {
       setIsStopped(false);
-      if (autoRead) speakText(initialDescription);
+      if (autoRead) trySpeak(initialDescription);
       hasSpokenRef.current = true;
     }
+    return () => { stopSpeech(); };
+  }, [initialDescription, autoReadLoaded]);
 
-    return () => {
-      stopSpeech();
-    };
-  }, [initialDescription]);
-
-  // Update speech rate when controls change
+  // --- Update speech rate when controls change ---
   useEffect(() => {
+    if (!autoReadLoaded) return;
     if (controls.rate !== currentRate) {
       setCurrentRate(controls.rate);
       setSpeechRate(controls.rate);
-      // Only restart reading if autoRead is enabled
       if (autoRead && description && hasSpokenRef.current) {
         setTimeout(() => {
           setIsStopped(false);
-          speakText(description);
+          trySpeak(description);
         }, 50);
       }
     }
-  }, [controls.rate, description]);
+  }, [controls.rate, description, autoRead, autoReadLoaded]);
 
-  // If user toggles autoRead ON and a description is present, read it
+  // --- React to autoRead toggle ---
   useEffect(() => {
+    if (!autoReadLoaded) return;
     if (autoRead && description && !isLoading) {
-      speakText(description);
+      trySpeak(description);
       setIsStopped(false);
     } else if (!autoRead) {
       stopSpeech();
       setIsStopped(true);
     }
-  }, [autoRead, description, isLoading]);
+  }, [autoRead, autoReadLoaded, description, isLoading]);
 
-  const analyzeImageAndSpeak = async () => {
+  // --- Centralized speech logic ---
+  const trySpeak = (text: string) => {
+    if (autoReadLoaded && autoRead) {
+      speakText(text);
+    }
+  };
+
+  // --- Analyze image and maybe speak ---
+  const analyzeImageAndMaybeSpeak = async () => {
     setIsLoading(true);
     try {
       const result = await analyzeImage(imageUri);
       setDescription(result);
       setIsStopped(false);
-      if (autoRead) speakText(result);
+      trySpeak(result);
       hasSpokenRef.current = true;
     } catch (error) {
       console.error('Error analyzing image:', error);
       const errorMessage = i18n.t('result.errorAnalyzing');
       setDescription(errorMessage);
       setIsStopped(false);
-      if (autoRead) speakText(errorMessage);
+      trySpeak(errorMessage);
       hasSpokenRef.current = true;
     } finally {
       setIsLoading(false);
     }
   };
 
+  // --- Handlers ---
   const handleTap = async (event: GestureResponderEvent) => {
-    // Disable double-tap during loading
     if (isLoading) return;
-    
     const currentTime = new Date().getTime();
     const timeDiff = currentTime - lastTapTime;
-    
-    // Detect double tap (within 300ms)
     if (timeDiff < 300) {
-      // Double tap detected, navigate back to camera
       stopSpeech();
       navigation.navigate('Camera');
     } else {
-      // Single tap - stop reading
       if (description && hasSpokenRef.current) {
         await stopSpeech();
         setIsStopped(true);
       }
     }
-    
     setLastTapTime(currentTime);
   };
 
@@ -148,16 +152,19 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     setCurrentRate(rate);
     setRate(rate);
     setIsStopped(false);
-    // Only read if autoRead is enabled
-    if (autoRead && description && hasSpokenRef.current) {
-      speakText(description);
+    if (autoReadLoaded && autoRead && description && hasSpokenRef.current) {
+      trySpeak(description);
     }
   };
 
+  // --- UI Guard: render nothing until autoReadLoaded ---
+  if (!autoReadLoaded) return null;
+
+  // --- Render ---
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar style="light" />
-      {/* Auto Read Toggle - now bottom left */}
+      {/* Auto Read Toggle - bottom left */}
       <View style={styles.autoReadToggleContainer}>
         <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
         <Switch
@@ -167,16 +174,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
           trackColor={{ false: '#888', true: '#a5d6a7' }}
         />
       </View>
-      
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUri }} style={styles.image} />
       </View>
-      
       <TouchableOpacity 
         style={styles.contentContainer}
         onPress={handleTap}
         activeOpacity={0.9}
-        disabled={isLoading} // Disable touch during loading
+        disabled={isLoading}
       >
         {isLoading ? (
           <View style={styles.loadingContainer}>
@@ -188,7 +193,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             <Text style={styles.heading}>{i18n.t('result.imageDescription')}</Text>
             <Text style={styles.description}>{description}</Text>
             <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
-            
             <View style={styles.controlsInfo}>
               {isStopped && (
                 <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
@@ -231,6 +235,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   );
 };
 
+// --- Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
