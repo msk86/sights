@@ -27,7 +27,8 @@
     "errorAnalyzing": "抱歉，分析图像时出错。请再试一次。",
     "speed": "速度: {{value}}x",
     "paused": "朗读已停止",
-    "autoRead": "自动朗读"
+    "autoRead": "自动朗读",
+    "donate": "捐赠"
   },
   "donate": {
     "title": "支持我们",

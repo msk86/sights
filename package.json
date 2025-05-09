@@ -8,7 +8,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:android": "eas build --platform android",
-    "build:ios": "eas build --platform ios"
+    "build:ios": "eas build --platform ios",
+    "build:apk": "eas build --platform android --profile development --local",
+    "build:apk:preview": "eas build --platform android --profile preview --local"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -27,7 +29,8 @@
     "react-native": "0.79.2",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-safe-area-context": "^5.4.0",
-    "react-native-screens": "^4.10.0"
+    "react-native-screens": "^4.10.0",
+    "expo-dev-client": "~5.1.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

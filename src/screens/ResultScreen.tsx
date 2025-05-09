@@ -189,25 +189,31 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       </TouchableOpacity>
       {/* Controls Row: Toggle, Stopped Text, Speed Button */}
       <View style={styles.controlsRow}>
-        <View style={styles.autoReadToggleContainer}>
-          <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
-          <Switch
-            value={autoRead}
-            onValueChange={setAutoRead}
-            thumbColor={autoRead ? '#4caf50' : '#ccc'}
-            trackColor={{ false: '#888', true: '#a5d6a7' }}
-          />
+        <View style={styles.controlsSide}>
+          <View style={styles.autoReadToggleContainer}>
+            <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
+            <Switch
+              value={autoRead}
+              onValueChange={setAutoRead}
+              thumbColor={autoRead ? '#4caf50' : '#ccc'}
+              trackColor={{ false: '#888', true: '#a5d6a7' }}
+            />
+          </View>
         </View>
-        {isStopped && (
-          <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
-        )}
-        <TouchableOpacity
-          style={styles.speedButton}
-          onPress={() => setShowSpeedModal(true)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
-        </TouchableOpacity>
+        <View style={styles.controlsCenter}>
+          {isStopped && (
+            <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
+          )}
+        </View>
+        <View style={styles.controlsSide}>
+          <TouchableOpacity
+            style={styles.speedButton}
+            onPress={() => setShowSpeedModal(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       {/* Donate Button - bottom center */}
       <TouchableOpacity
@@ -215,7 +221,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
         onPress={() => nav.navigate('Donate' as never)}
         activeOpacity={0.85}
       >
-        <Text style={styles.donateButtonText}>❤️ Donate</Text>
+        <Text style={styles.donateButtonText}>❤️ {i18n.t('result.donate')} ❤️</Text>
       </TouchableOpacity>
       {/* Speed Selection Modal */}
       <Modal
@@ -302,8 +308,19 @@ const styles = StyleSheet.create({
     bottom: 110,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     zIndex: 12,
+    paddingHorizontal: 24,
+  },
+  controlsSide: {
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  controlsCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   autoReadToggleContainer: {
     flexDirection: 'row',

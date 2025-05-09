@@ -27,7 +27,8 @@
     "errorAnalyzing": "Sorry, there was an error analyzing the image. Please try again.",
     "speed": "Speed: {{value}}x",
     "paused": "Reading stopped",
-    "autoRead": "Auto Read"
+    "autoRead": "Auto Read",
+    "donate": "Donate"
   },
   "donate": {
     "title": "Support Us",
