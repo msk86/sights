@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Pressable, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, SafeAreaView, BackHandler } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -21,6 +21,15 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
     i18n.t('tutorial.adjustSpeed'),
     i18n.t('tutorial.retake'),
   ];
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      stopSpeech();
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
   
   useEffect(() => {
     // Speak the current tutorial step
