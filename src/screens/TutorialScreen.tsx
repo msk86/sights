@@ -52,7 +52,7 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
       // Mark tutorial as completed
       await markTutorialAsCompleted();
       // Navigate to camera screen
-      navigation.navigate('Camera');
+      navigation.replace('Camera');
     }
   };
   
