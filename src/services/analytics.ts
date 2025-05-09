@@ -1,5 +1,5 @@
 import PostHog from 'posthog-react-native';
-
+import { Platform } from 'react-native';
 // Initialize PostHog
 const posthog = new PostHog(process.env.EXPO_PUBLIC_POSTHOG_API_KEY, {
   host: 'https://us.i.posthog.com',
@@ -10,6 +10,7 @@ export const trackAppOpen = async () => {
   try {
     await posthog.capture('app_open', {
       timestamp: new Date().toISOString(),
+      device: Platform.OS,
     });
   } catch (error) {
     console.warn('Error tracking app open:', error);
@@ -21,6 +22,7 @@ export const trackPhotoTaken = async () => {
   try {
     await posthog.capture('photo_taken', {
       timestamp: new Date().toISOString(),
+      device: Platform.OS,
     });
   } catch (error) {
     console.warn('Error tracking photo taken:', error);
@@ -33,6 +35,7 @@ export const trackAutoReadPreference = async (enabled: boolean) => {
     await posthog.capture('set_preference_auto_read', {
       enabled,
       timestamp: new Date().toISOString(),
+      device: Platform.OS,
     });
   } catch (error) {
     console.warn('Error tracking auto read preference:', error);
@@ -44,6 +47,7 @@ export const trackDonateClick = async () => {
   try {
     await posthog.capture('click_donate', {
       timestamp: new Date().toISOString(),
+      device: Platform.OS,
     });
   } catch (error) {
     console.warn('Error tracking donate click:', error);
