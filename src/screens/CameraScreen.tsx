@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, Button, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, BackHandler } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -16,6 +16,20 @@ type CameraScreenProps = {
 const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
+  
+    // Add back handler
+    useEffect(() => {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          BackHandler.exitApp();
+        }
+        return true;
+      });
+  
+      return () => backHandler.remove();
+    }, [navigation]);
 
   useEffect(() => {
     // Request camera permission

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Linking, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Linking, TouchableOpacity, ScrollView, BackHandler } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import i18n from '../i18n';
 
@@ -8,6 +8,16 @@ const PAYPAL_URL = 'https://www.paypal.com/paypalme/msk1986'; // Replace with yo
 
 const DonateScreen: React.FC = () => {
   const navigation = useNavigation();
+
+  // Add back handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      navigation.goBack();
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

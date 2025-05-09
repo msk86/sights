@@ -55,14 +55,28 @@ const AppNavigator = () => {
         initialRouteName={hasCompletedTutorial ? "Camera" : "Tutorial"}
         screenOptions={{
           headerShown: false,
-          gestureEnabled: false, // Disable swipe gestures for accessibility
+          gestureEnabled: false, // Disable swipe gestures by default
           animation: 'fade' // Smoother transitions
         }}
       >
         <Stack.Screen name="Tutorial" component={TutorialScreen} />
         <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="Result" component={ResultScreen} />
-        <Stack.Screen name="Donate" component={DonateScreen} options={{ headerShown: true, title: 'Donate' }} />
+        <Stack.Screen 
+          name="Result" 
+          component={ResultScreen}
+          options={{
+            gestureEnabled: true, // Enable swipe back gesture for Result screen
+            gestureDirection: 'horizontal',
+          }}
+        />
+        <Stack.Screen 
+          name="Donate" 
+          component={DonateScreen} 
+          options={{ 
+            gestureEnabled: true, // Enable swipe back gesture for Donate screen
+            gestureDirection: 'horizontal',
+          }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
