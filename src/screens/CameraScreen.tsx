@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, Button, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { speakText, stopSpeech } from '../services/speech';
@@ -49,8 +50,12 @@ const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
         });
         
         if (!result.canceled && result.assets && result.assets.length > 0) {
-          // Navigate to the result screen with the image URI
-          navigation.navigate('Result', { imageUri: result.assets[0].uri });
+          const manipResult = await ImageManipulator.manipulateAsync(
+            result.assets[0].uri,
+            [{ resize: { width: 1024 } }],
+            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+          );
+          navigation.navigate('Result', { imageUri: manipResult.uri });
         } else {
           setIsTakingPicture(false);
           speakText(i18n.t('camera.cancelled'));

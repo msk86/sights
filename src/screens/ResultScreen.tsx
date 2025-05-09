@@ -160,8 +160,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
 
   // Add back handler with speech stop
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', async () => {
-      await stopSpeech();
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      stopSpeech();
       BackHandler.exitApp();
       return true;
     });
