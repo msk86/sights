@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch, BackHandler } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -157,6 +157,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     setIsStopped(false);
     // Do not trigger reading here; let the effect handle it
   };
+
+  // Add back handler with speech stop
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', async () => {
+      await stopSpeech();
+      BackHandler.exitApp();
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, []);
 
   // --- UI Guard: render nothing until autoReadLoaded ---
   if (!autoReadLoaded) return null;
