@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -8,11 +8,14 @@ import { analyzeImage } from '../services/openai';
 import { speakText, stopSpeech, setSpeechRate, getSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ResultScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Result'>;
   route: RouteProp<RootStackParamList, 'Result'>;
 };
+
+const AUTO_READ_KEY = 'AUTO_READ_ENABLED';
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   const { imageUri, description: initialDescription } = route.params;
@@ -31,6 +34,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     { value: (1.0 + maxRate) / 2 },
     { value: maxRate },
   ];
+  const [autoRead, setAutoRead] = useState(true);
 
   // Initialize speech service and load saved rate
   useEffect(() => {
@@ -42,18 +46,29 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     initializeSpeech();
   }, []);
 
+  // Load auto-read setting on mount
+  useEffect(() => {
+    (async () => {
+      const saved = await AsyncStorage.getItem(AUTO_READ_KEY);
+      if (saved !== null) setAutoRead(saved === 'true');
+    })();
+  }, []);
+
+  // Save auto-read setting when changed
+  useEffect(() => {
+    AsyncStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
+  }, [autoRead]);
+
   // Analyze the image when component mounts if no description provided
   useEffect(() => {
     if (!initialDescription) {
       analyzeImageAndSpeak();
     } else {
-      // If we already have a description, just speak it
       setIsStopped(false);
-      speakText(initialDescription);
+      if (autoRead) speakText(initialDescription);
       hasSpokenRef.current = true;
     }
 
-    // Clean up speech when component unmounts
     return () => {
       stopSpeech();
     };
@@ -64,11 +79,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     if (controls.rate !== currentRate) {
       setCurrentRate(controls.rate);
       setSpeechRate(controls.rate);
-      
-      // If we already have a description and have spoken before,
-      // restart reading from the beginning with the new speed
-      if (description && hasSpokenRef.current) {
-        // Small delay to allow the rate to be updated first
+      // Only restart reading if autoRead is enabled
+      if (autoRead && description && hasSpokenRef.current) {
         setTimeout(() => {
           setIsStopped(false);
           speakText(description);
@@ -77,20 +89,31 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     }
   }, [controls.rate, description]);
 
+  // If user toggles autoRead ON and a description is present, read it
+  useEffect(() => {
+    if (autoRead && description && !isLoading) {
+      speakText(description);
+      setIsStopped(false);
+    } else if (!autoRead) {
+      stopSpeech();
+      setIsStopped(true);
+    }
+  }, [autoRead, description, isLoading]);
+
   const analyzeImageAndSpeak = async () => {
     setIsLoading(true);
     try {
       const result = await analyzeImage(imageUri);
       setDescription(result);
       setIsStopped(false);
-      speakText(result);
+      if (autoRead) speakText(result);
       hasSpokenRef.current = true;
     } catch (error) {
       console.error('Error analyzing image:', error);
       const errorMessage = i18n.t('result.errorAnalyzing');
       setDescription(errorMessage);
       setIsStopped(false);
-      speakText(errorMessage);
+      if (autoRead) speakText(errorMessage);
       hasSpokenRef.current = true;
     } finally {
       setIsLoading(false);
@@ -125,7 +148,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     setCurrentRate(rate);
     setRate(rate);
     setIsStopped(false);
-    if (description && hasSpokenRef.current) {
+    // Only read if autoRead is enabled
+    if (autoRead && description && hasSpokenRef.current) {
       speakText(description);
     }
   };
@@ -133,6 +157,16 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar style="light" />
+      {/* Auto Read Toggle - now bottom left */}
+      <View style={styles.autoReadToggleContainer}>
+        <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
+        <Switch
+          value={autoRead}
+          onValueChange={setAutoRead}
+          thumbColor={autoRead ? '#4caf50' : '#ccc'}
+          trackColor={{ false: '#888', true: '#a5d6a7' }}
+        />
+      </View>
       
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUri }} style={styles.image} />
@@ -315,6 +349,20 @@ const styles = StyleSheet.create({
   speedOptionText: {
     fontSize: 16,
     color: '#222',
+  },
+  autoReadToggleContainer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  autoReadLabel: {
+    color: '#fff',
+    fontSize: 16,
+    marginRight: 8,
+    fontWeight: 'bold',
   },
 });
 

@@ -11,7 +11,7 @@ let bestChineseVoice: string | null = null;
 const defaultOptions = {
   language: 'en-US',
   pitch: 1.0,
-  rate: 0.8, // Default reading speed
+  rate: 1.0, // Default reading speed
 };
 
 // Storage key for speech rate
@@ -139,10 +139,16 @@ export const speakText = async (
     // Stop any existing speech
     await stopSpeech();
 
+    // Determine language and best voice for current locale
+    const language = options.language || getLanguageForCurrentLocale();
+    const voice = options.voice || await getBestVoiceForLanguage(language);
+
     // Prepare the text and options
     const mergedOptions = {
       ...currentSpeech.options,
       ...options,
+      language,
+      voice,
       onDone: () => {
         currentSpeech.isPlaying = false;
         console.log('Reading completed');
@@ -180,7 +186,7 @@ export const speakText = async (
     };
 
     // Start speaking
-    console.log(`Starting to read text, rate: ${mergedOptions.rate}`);
+    console.log(`Starting to read text, rate: ${mergedOptions.rate}, language: ${mergedOptions.language}, voice: ${mergedOptions.voice}`);
     await Speech.speak(text, mergedOptions);
   } catch (error) {
     console.error('Error starting reading:', error);

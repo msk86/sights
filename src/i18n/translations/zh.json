@@ -26,7 +26,8 @@
     "doubleTapRetake": "双击重新拍照",
     "errorAnalyzing": "抱歉，分析图像时出错。请再试一次。",
     "speed": "速度: {{value}}x",
-    "paused": "朗读已停止"
+    "paused": "朗读已停止",
+    "autoRead": "自动朗读"
   },
   "common": {
     "appName": "视觉"
