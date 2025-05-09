@@ -40,7 +40,7 @@ const getBestVoiceForLanguage = async (language: string): Promise<string | undef
 
       // Find Chinese voices
       const chineseVoices = voices.filter(v => 
-        v.language === 'zh-CN' || v.language === 'zh-TW' || v.language === 'zh-HK'
+        v.language === 'zh-CN' || v.language === 'zh-TW' || v.language === 'zh-HK' || v.language === 'zh'
       );
 
       if (chineseVoices.length > 0) {
@@ -54,7 +54,7 @@ const getBestVoiceForLanguage = async (language: string): Promise<string | undef
 
       // Find English voices
       const englishVoices = voices.filter(v => 
-        v.language === 'en-US' || v.language === 'en-GB'
+        v.language === 'en-US' || v.language === 'en-GB' || v.language === 'en'
       );
 
       if (englishVoices.length > 0) {

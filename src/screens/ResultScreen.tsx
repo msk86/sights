@@ -116,15 +116,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       const result = await analyzeImage(imageUri);
       setDescription(result);
       setIsStopped(false);
-      trySpeak(result);
-      hasSpokenRef.current = true;
     } catch (error) {
       console.error('Error analyzing image:', error);
       const errorMessage = i18n.t('result.errorAnalyzing');
       setDescription(errorMessage);
       setIsStopped(false);
-      trySpeak(errorMessage);
-      hasSpokenRef.current = true;
     } finally {
       setIsLoading(false);
     }
