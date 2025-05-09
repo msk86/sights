@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AppNavigator from './src/navigation/AppNavigator';
 import './src/i18n'; // Import to initialize i18n
 import { initSpeech } from './src/services/speech'; // Import speech initialization
+import { trackAppOpen } from './src/services/analytics';
 
 // Ignore specific warnings that might come from libraries
 LogBox.ignoreLogs([
@@ -14,14 +15,17 @@ LogBox.ignoreLogs([
 export default function App() {
   // Initialize speech service on app startup
   useEffect(() => {
-    const setupSpeech = async () => {
-      await initSpeech();
-      console.log('Speech service initialized');
+    const setup = async () => {
+      try {
+        await initSpeech();
+        await trackAppOpen();
+        console.log('App initialized');
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+      }
     };
     
-    setupSpeech().catch(error => {
-      console.error('Failed to initialize speech service:', error);
-    });
+    setup();
   }, []);
 
   return (

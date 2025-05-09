@@ -7,6 +7,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { speakText, stopSpeech } from '../services/speech';
 import { StatusBar } from 'expo-status-bar';
 import i18n from '../i18n';
+import { trackPhotoTaken } from '../services/analytics';
 
 type CameraScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Camera'>;
@@ -50,6 +51,7 @@ const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
         });
         
         if (!result.canceled && result.assets && result.assets.length > 0) {
+          await trackPhotoTaken();
           const manipResult = await ImageManipulator.manipulateAsync(
             result.assets[0].uri,
             [{ resize: { height: 1024 } }],

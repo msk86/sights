@@ -9,6 +9,7 @@ import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } fr
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trackAutoReadPreference } from '../services/analytics';
 
 // --- Types ---
 type ResultScreenProps = {
@@ -51,6 +52,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   // --- Save autoRead to storage when changed ---
   useEffect(() => {
     AsyncStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
+    trackAutoReadPreference(autoRead);
   }, [autoRead]);
 
   // --- Initialize speech service and load saved rate ---
