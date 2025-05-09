@@ -23,8 +23,10 @@ export const encodeImageToBase64 = async (uri: string): Promise<string> => {
 };
 
 export const analyzeImage = async (imageUri: string): Promise<string> => {
+  const base64Image = await encodeImageToBase64(imageUri);
   if (isChineseLocale()) {
-    return analyzeWithQwen(imageUri);
+    return analyzeWithQwen(base64Image);
+  } else {
+    return analyzeWithOpenAI(base64Image);
   }
-  return analyzeWithOpenAI(imageUri);
 }; 

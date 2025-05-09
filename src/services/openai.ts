@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { encodeImageToBase64 } from './imageAnalysis';
 
 // Get appropriate prompt text based on current language
 const getLocalizedPrompt = (): string => {
@@ -17,9 +16,8 @@ const getLanguageInstruction = (): string => {
 };
 
 // Analyze image using OpenAI's Vision API
-export const analyzeImage = async (imageUri: string): Promise<string> => {
+export const analyzeImage = async (base64Image: string): Promise<string> => {
   try {
-    const base64Image = await encodeImageToBase64(imageUri);
     const prompt = getLocalizedPrompt();
     const languageInstruction = getLanguageInstruction();
     const fullPrompt = `${prompt} ${languageInstruction}`;
