@@ -52,8 +52,8 @@ const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
         if (!result.canceled && result.assets && result.assets.length > 0) {
           const manipResult = await ImageManipulator.manipulateAsync(
             result.assets[0].uri,
-            [{ resize: { width: 1024 } }],
-            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+            [{ resize: { height: 1024 } }],
+            { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
           );
           navigation.navigate('Result', { imageUri: manipResult.uri });
         } else {

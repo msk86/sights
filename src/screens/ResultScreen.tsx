@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { analyzeImage } from '../services/openai';
+import { analyzeImage } from '../services/imageAnalysis';
 import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
