@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { analyzeImage } from '../services/openai';
-import { speakText, stopSpeech, setSpeechRate, getSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
+import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     zIndex: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
   },
   controlsSide: {
     flexShrink: 0,
@@ -325,12 +325,12 @@ const styles = StyleSheet.create({
   autoReadToggleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 8,
   },
   autoReadLabel: {
     color: '#fff',
-    fontSize: 16,
-    marginRight: 8,
+    fontSize: 14,
+    marginRight: 4,
     fontWeight: 'bold',
   },
   stoppedText: {
@@ -341,9 +341,9 @@ const styles = StyleSheet.create({
   },
   speedButton: {
     backgroundColor: '#222',
-    borderRadius: 24,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   speedButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   donateButton: {
     position: 'absolute',

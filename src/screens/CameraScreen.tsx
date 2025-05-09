@@ -3,7 +3,7 @@ import { StyleSheet, View, TouchableOpacity, Text, ActivityIndicator, Button, Im
 import * as ImagePicker from 'expo-image-picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { speakText, stopSpeaking } from '../services/speech';
+import { speakText, stopSpeech } from '../services/speech';
 import { StatusBar } from 'expo-status-bar';
 import i18n from '../i18n';
 
@@ -32,7 +32,7 @@ const CameraScreen: React.FC<CameraScreenProps> = ({ navigation }) => {
 
     // Clean up speech when component unmounts
     return () => {
-      stopSpeaking();
+      stopSpeech();
     };
   }, []);
 
