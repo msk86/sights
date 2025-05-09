@@ -3,7 +3,7 @@
     "welcome": "Welcome to Sights, an app designed to help you understand what's around you. To get started, tap anywhere on the screen.",
     "takePhoto": "To take a picture, simply tap once anywhere on the screen. The app will automatically capture and analyze what's in front of you.",
     "adjustVolume": "Use your device's volume buttons to adjust the volume.",
-    "adjustSpeed": "To change the reading speed, slide your finger up or down on the screen.",
+    "adjustSpeed": "To change the reading speed, slide your finger up or down on the screen, or tap the button.",
     "retake": "While viewing results, to stop reading, tap the screen, to retake a picture, double tap the screen. Let's get started!",
     "step": "Step {{step}} of {{total}}",
     "tapToContinue": "Tap anywhere to continue"
@@ -26,7 +26,8 @@
     "doubleTapRetake": "Double tap to take another picture",
     "errorAnalyzing": "Sorry, there was an error analyzing the image. Please try again.",
     "speed": "Speed: {{value}}x",
-    "paused": "Reading stopped"
+    "paused": "Reading stopped",
+    "autoRead": "Auto Read"
   },
   "common": {
     "appName": "Sights"

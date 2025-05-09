@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { speakText, stopSpeaking } from '../services/speech';
+import { speakText, stopSpeech } from '../services/speech';
 import { markTutorialAsCompleted } from '../services/storage';
 import i18n from '../i18n';
 
@@ -28,14 +28,14 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
     
     // Clean up speech when component unmounts
     return () => {
-      stopSpeaking();
+      stopSpeech();
     };
   }, [tutorialStep]);
   
   const handleAdvanceTutorial = async () => {
+    console.log('Tutorial tap detected');
     // Stop the current speech
-    stopSpeaking();
-    
+    stopSpeech();
     // Move to the next step or navigate to camera if tutorial is complete
     if (tutorialStep < tutorialSteps.length - 1) {
       setTutorialStep(tutorialStep + 1);
@@ -50,10 +50,9 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <TouchableOpacity
+      <Pressable
         style={styles.touchArea}
         onPress={handleAdvanceTutorial}
-        activeOpacity={0.8}
       >
         <View style={styles.content}>
           <Text style={styles.heading}>{i18n.t('common.appName')}</Text>
@@ -63,7 +62,7 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
           <Text style={styles.instruction}>{tutorialSteps[tutorialStep]}</Text>
           <Text style={styles.hint}>{i18n.t('tutorial.tapToContinue')}</Text>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </SafeAreaView>
   );
 };
