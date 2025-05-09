@@ -56,11 +56,10 @@ Then, scan the QR code with the Expo Go app on your device, or press 'i' for iOS
 - React Native
 - Expo
 - TypeScript
-- OpenAI Vision API
+- OpenAI API
 - React Navigation
 - Expo Camera
 - Expo Speech
-- React Native Dotenv
 
 ## License
 
