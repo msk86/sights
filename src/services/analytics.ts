@@ -33,7 +33,7 @@ export const trackPhotoTaken = async () => {
 
 // Track auto read preference
 export const trackAutoReadPreference = async (enabled: boolean) => {
-  console.log('Tracking auto read preference');
+  console.log('Tracking auto read preference:', enabled);
   try {
     await posthog.capture('set_preference_auto_read', {
       enabled,
@@ -47,7 +47,7 @@ export const trackAutoReadPreference = async (enabled: boolean) => {
 
 // Track speed change
 export const trackSpeedPreference = async (rate: number, by: string) => {
-  console.log('Tracking speed preference');
+  console.log('Tracking speed preference:', rate, by);
   try {
     await posthog.capture('set_preference_read_speed', {
       rate: rate.toFixed(1),
@@ -74,7 +74,7 @@ export const trackDonateClick = async () => {
 };
 
 export const trackLLM = async (llm: string) => {
-  console.log('Tracking LLM');
+  console.log('Tracking LLM:', llm);
   try {
     await posthog.capture('llm_used', {
       llm,
