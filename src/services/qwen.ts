@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Get appropriate prompt text for Chinese
 const getLocalizedPrompt = (): string => {
-  return "请详细描述这张图片，描述应适合视障人士理解。只描述主要内容、位置、颜色和任何重要的环境信息，只描述实施，不要扩展。请保持描述清晰简洁，200字以内，不要使用Bullet Points。";
+  return "请详细描述这张图片，描述应适合视障人士理解。只描述主要内容、位置、颜色和任何重要的环境信息、文字信息，只描述实施，不要扩展。请保持描述清晰简洁，200字以内，不要使用Bullet Points。";
 };
 
 // Analyze image using Qwen-VL-Chat API
