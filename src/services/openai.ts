@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getCurrentLocale } from '../i18n';
+
 // Get appropriate prompt text based on current language
 const getLocalizedPrompt = (): string => {
-  return "Please describe this image in detail for a blind person. Focus on the main subjects, their positions, colors, and any important text or context. Keep the description clear and concise, 200 words or less, avoid bullet points.";
+  return "Please describe this image in detail for a blind person. Focus on the main subjects, their positions, colors, and any important text or context. Keep the description clear and concise, must be less than 200 words, avoid bullet points.";
 };
 
 // Get language instruction for the AI
