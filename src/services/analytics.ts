@@ -85,3 +85,15 @@ export const trackLLM = async (llm: string) => {
     console.warn('Error tracking LLM:', error);
   }
 };
+
+// Track double tap to retake
+export const trackDoubleTapRetake = async () => {
+  try {
+    await posthog.capture('double_tap_retake', {
+      timestamp: new Date().toISOString(),
+      device: Platform.OS,
+    });
+  } catch (error) {
+    console.warn('Error tracking double tap retake:', error);
+  }
+};

@@ -9,7 +9,7 @@ import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } fr
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { trackAutoReadPreference, trackDonateClick, trackSpeedPreference } from '../services/analytics';
+import { trackAutoReadPreference, trackDonateClick, trackSpeedPreference, trackDoubleTapRetake } from '../services/analytics';
 
 // --- Types ---
 type ResultScreenProps = {
@@ -140,6 +140,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       stopSpeech();
       setIsStopped(true);
       hasSpokenRef.current = false;
+      trackDoubleTapRetake();
       navigation.navigate('Camera');
     } else {
       // Single tap - stop reading if currently playing
