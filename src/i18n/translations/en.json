@@ -2,9 +2,9 @@
   "tutorial": {
     "welcome": "Welcome to Sights, an app designed to help you understand what's around you. To get started, tap anywhere on the screen.",
     "takePhoto": "To take a picture, simply tap once anywhere on the screen. The app will automatically capture and analyze what's in front of you.",
-    "autoRead": "The app automatically reads the analysis text, you can tap the screen to stop reading. You can also stop the automatic reading and read it through the system screen reader.",
-    "adjustSpeed": "To change the reading speed, slide your finger up or down on the screen, or tap the speed button.",
-    "retake": "While viewing results, you can either double tap the screen or use the retake button to take another picture. Let's get started!",
+    "autoRead": "When system screen reader is not enabled, the app will automatically read the analysis text. You can tap the screen to stop reading, or use the auto-read toggle to disable this feature.",
+    "adjustSpeed": "When auto-read is enabled, you can change the reading speed by sliding your finger up or down on the screen, or by tapping the speed button.",
+    "retake": "After viewing results, you can take another picture by either tapping the retake button or double tapping the screen. Let's get started!",
     "step": "Step {{step}} of {{total}}",
     "tapToContinue": "Tap anywhere to continue"
   },
