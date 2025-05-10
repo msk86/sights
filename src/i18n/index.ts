@@ -28,7 +28,7 @@ export const getCurrentLocale = (): string => {
 
 // Function to check if current locale is Chinese
 export const isChineseLocale = (): boolean => {
-  return i18n.locale.startsWith('zh');
+  return i18n.locale.toLowerCase().startsWith('zh');
 };
 
 export default i18n; 

@@ -37,7 +37,8 @@
     "alipay": "支付宝",
     "alipayHint": "请扫描二维码进行捐赠",
     "paypal": "PayPal",
-    "paypalButton": "捐赠给视觉"
+    "paypalButton": "捐赠给视觉",
+    "feedback": "吐槽一下"
   },
   "common": {
     "appName": "视觉"

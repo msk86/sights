@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch, BackHandler } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch, BackHandler, Platform, TouchableWithoutFeedback, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -8,8 +8,9 @@ import { analyzeImage } from '../services/imageAnalysis';
 import { speakText, stopSpeech, setSpeechRate, getMaxSpeechRate, initSpeech } from '../services/speech';
 import { useGestures } from '../hooks/useGestures';
 import i18n from '../i18n';
+import { isChineseLocale } from '../i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { trackAutoReadPreference, trackDonateClick, trackSpeedPreference, trackDoubleTapRetake } from '../services/analytics';
+import { trackAutoReadPreference, trackDonateClick, trackSpeedPreference, trackDoubleTapRetake, trackFeedbackClick } from '../services/analytics';
 
 // --- Types ---
 type ResultScreenProps = {
@@ -172,6 +173,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     return () => backHandler.remove();
   }, []);
 
+  const handleFeedbackPress = async () => {
+    const feedbackUrl = isChineseLocale()
+      ? 'https://jsj.top/f/hDiMMe'
+      : 'https://jsj.top/f/y8Pldw';
+    
+    await trackFeedbackClick();
+    await Linking.openURL(feedbackUrl);
+  };
+
   // --- UI Guard: render nothing until autoReadLoaded ---
   if (!autoReadLoaded) return null;
 
@@ -232,14 +242,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* Donate Button - bottom center */}
+      {/* Revert to single centered donate button */}
       <TouchableOpacity
         style={styles.donateButton}
         onPress={() => {
           trackDonateClick();
-          return nav.navigate('Donate' as never);
+          navigation.navigate('Donate' as never);
         }}
-        activeOpacity={0.85}
+        activeOpacity={0.6}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         <Text style={styles.donateButtonText}>❤️ {i18n.t('result.donate')} ❤️</Text>
       </TouchableOpacity>
@@ -383,13 +394,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 11,
+    minHeight: 44,
   },
   donateButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
     backgroundColor: '#e91e63',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 24,
     overflow: 'hidden',

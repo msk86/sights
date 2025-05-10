@@ -37,7 +37,8 @@
     "alipay": "Alipay",
     "alipayHint": "Please scan the QR code to donate",
     "paypal": "PayPal",
-    "paypalButton": "Donate to Sights"
+    "paypalButton": "Donate to Sights",
+    "feedback": "Give Feedback"
   },
   "common": {
     "appName": "Sights"
