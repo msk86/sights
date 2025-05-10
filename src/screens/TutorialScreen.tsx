@@ -17,7 +17,7 @@ const TutorialScreen: React.FC<TutorialScreenProps> = ({ navigation }) => {
   const tutorialSteps = [
     i18n.t('tutorial.welcome'),
     i18n.t('tutorial.takePhoto'),
-    i18n.t('tutorial.adjustVolume'),
+    i18n.t('tutorial.autoRead'),
     i18n.t('tutorial.adjustSpeed'),
     i18n.t('tutorial.retake'),
   ];
