@@ -1,18 +1,13 @@
 import axios from 'axios';
-
+import { getCurrentLocale } from '../i18n';
 // Get appropriate prompt text based on current language
 const getLocalizedPrompt = (): string => {
-  const prompts = {
-    en: "Please describe this image in detail for a blind person. Focus on the main subjects, their positions, colors, and any important text or context. Keep the description clear and concise, 200 words or less, avoid bullet points.",
-    zh: "请详细描述这张图片，描述应适合视障人士理解。重点描述主要内容、位置、颜色和任何重要的环境信息。请保持描述清晰简洁。",
-  };
-  
-  return prompts.en; // OpenAI service only handles English
+  return "Please describe this image in detail for a blind person. Focus on the main subjects, their positions, colors, and any important text or context. Keep the description clear and concise, 200 words or less, avoid bullet points.";
 };
 
 // Get language instruction for the AI
 const getLanguageInstruction = (): string => {
-  return "Please respond in English.";
+  return `Please respond in: ${getCurrentLocale()}.`;
 };
 
 // Analyze image using OpenAI's Vision API
