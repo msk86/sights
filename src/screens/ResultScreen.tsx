@@ -217,20 +217,44 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
         onPress={handleTap}
         activeOpacity={0.9}
         disabled={isLoading}
+        accessible={true}
+        accessibilityRole="none"
       >
         {isLoading ? (
-          <View style={styles.loadingContainer}>
+          <View 
+            style={styles.loadingContainer}
+            accessible={true}
+            accessibilityRole="alert"
+            accessibilityLabel={i18n.t('result.analyzing')}
+            accessibilityHint={i18n.t('result.analyzingHint')}
+          >
             <ActivityIndicator size="large" color="#FFFFFF" />
             <Text style={styles.loadingText}>{i18n.t('result.analyzing')}</Text>
           </View>
         ) : (
           <>
-            <Text style={styles.heading}>{i18n.t('result.imageDescription')}</Text>
-            <Text style={styles.description}>{description}</Text>
+            <Text 
+              style={styles.heading}
+              accessible={false}
+              importantForAccessibility="no"
+            >
+              {i18n.t('result.imageDescription')}
+            </Text>
+            <Text 
+              style={styles.description}
+              accessible={true}
+              accessibilityRole="text"
+            >
+              {description}
+            </Text>
             <TouchableOpacity
               style={styles.retakeButton}
               onPress={handleRetake}
               activeOpacity={0.8}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={i18n.t('result.retake')}
+              accessibilityHint={i18n.t('result.retakeHint')}
             >
               <Text style={styles.retakeButtonText}>{i18n.t('result.retake')}</Text>
             </TouchableOpacity>
