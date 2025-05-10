@@ -135,12 +135,23 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   // --- Handlers ---
   const handleTap = async (event: GestureResponderEvent) => {
     if (isLoading) return;
-    // Single tap - stop reading if currently playing
-    if (!isStopped) {
-      await stopSpeech();
+    const currentTime = new Date().getTime();
+    const timeDiff = currentTime - lastTapTime;
+    if (timeDiff < 300) {
+      stopSpeech();
       setIsStopped(true);
       hasSpokenRef.current = false;
+      trackDoubleTapRetake();
+      navigation.navigate('Camera');
+    } else {
+      // Single tap - stop reading if currently playing
+      if (!isStopped) {
+        await stopSpeech();
+        setIsStopped(true);
+        hasSpokenRef.current = false;
+      }
     }
+    setLastTapTime(currentTime);
   };
 
   const handleRetake = () => {
@@ -169,15 +180,6 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
 
     return () => backHandler.remove();
   }, []);
-
-  const handleFeedbackPress = async () => {
-    const feedbackUrl = isChineseLocale()
-      ? 'https://jsj.top/f/hDiMMe'
-      : 'https://jsj.top/f/y8Pldw';
-    
-    await trackFeedbackClick();
-    await Linking.openURL(feedbackUrl);
-  };
 
   // --- UI Guard: render nothing until autoReadLoaded ---
   if (!autoReadLoaded) return null;
@@ -211,6 +213,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             >
               <Text style={styles.retakeButtonText}>{i18n.t('result.retake')}</Text>
             </TouchableOpacity>
+            <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
           </>
         )}
       </TouchableOpacity>
