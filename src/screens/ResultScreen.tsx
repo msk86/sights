@@ -135,23 +135,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   // --- Handlers ---
   const handleTap = async (event: GestureResponderEvent) => {
     if (isLoading) return;
-    const currentTime = new Date().getTime();
-    const timeDiff = currentTime - lastTapTime;
-    if (timeDiff < 300) {
-      stopSpeech();
+    // Single tap - stop reading if currently playing
+    if (!isStopped) {
+      await stopSpeech();
       setIsStopped(true);
       hasSpokenRef.current = false;
-      trackDoubleTapRetake();
-      navigation.navigate('Camera');
-    } else {
-      // Single tap - stop reading if currently playing
-      if (!isStopped) {
-        await stopSpeech();
-        setIsStopped(true);
-        hasSpokenRef.current = false;
-      }
     }
-    setLastTapTime(currentTime);
+  };
+
+  const handleRetake = () => {
+    stopSpeech();
+    setIsStopped(true);
+    hasSpokenRef.current = false;
+    trackDoubleTapRetake();
+    navigation.navigate('Camera');
   };
 
   const handleSpeedSelect = (rate: number) => {
@@ -207,7 +204,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
           <>
             <Text style={styles.heading}>{i18n.t('result.imageDescription')}</Text>
             <Text style={styles.description}>{description}</Text>
-            <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
+            <TouchableOpacity
+              style={styles.retakeButton}
+              onPress={handleRetake}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.retakeButtonText}>{i18n.t('result.retake')}</Text>
+            </TouchableOpacity>
           </>
         )}
       </TouchableOpacity>
@@ -324,7 +327,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   hint: {
     color: '#CCCCCC',
@@ -347,6 +350,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
   },
   controlsCenter: {
     flex: 1,
@@ -369,6 +374,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginHorizontal: 16,
+  },
+  retakeButton: {
+    backgroundColor: '#e91e63',
+    borderRadius: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    marginBottom: 20,
+  },
+  retakeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   speedButton: {
     backgroundColor: '#222',

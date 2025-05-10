@@ -4,7 +4,7 @@
     "takePhoto": "拍照时，只需点击屏幕上的任意位置。应用会自动捕捉并分析您面前的景物。",
     "autoRead": "软件会自动阅读分析文字，可以单击屏幕停止朗读。您也可以关闭自动阅读，通过系统读屏来阅读。",
     "adjustSpeed": "要更改阅读速度，请在屏幕上上下滑动手指，或者点击屏幕上的按钮。",
-    "retake": "查看结果时，双击屏幕可以重新拍照。让我们开始吧！",
+    "retake": "查看结果时，您可以点击重新拍照按钮来拍摄新照片。让我们开始吧！",
     "step": "第 {{step}} 步，共 {{total}} 步",
     "tapToContinue": "点击任意位置继续"
   },
@@ -23,7 +23,7 @@
   "result": {
     "analyzing": "正在分析图像...",
     "imageDescription": "图像描述",
-    "doubleTapRetake": "双击重新拍照",
+    "retake": "重新拍照",
     "errorAnalyzing": "抱歉，分析图像时出错。请再试一次。",
     "selectSpeed": "选择速度",
     "speed": "速度: {{value}}x",

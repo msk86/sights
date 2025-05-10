@@ -4,7 +4,7 @@
     "takePhoto": "To take a picture, simply tap once anywhere on the screen. The app will automatically capture and analyze what's in front of you.",
     "autoRead": "The app automatically reads the analysis text, you can tap the screen to stop reading. You can also stop the automatic reading and read it through the system screen reader.",
     "adjustSpeed": "To change the reading speed, slide your finger up or down on the screen, or tap the button.",
-    "retake": "While viewing results, to retake a picture, double tap the screen. Let's get started!",
+    "retake": "While viewing results, you can tap the retake button to take another picture. Let's get started!",
     "step": "Step {{step}} of {{total}}",
     "tapToContinue": "Tap anywhere to continue"
   },
@@ -23,7 +23,7 @@
   "result": {
     "analyzing": "Analyzing image...",
     "imageDescription": "Image Description",
-    "doubleTapRetake": "Double tap to take another picture",
+    "retake": "Retake",
     "errorAnalyzing": "Sorry, there was an error analyzing the image. Please try again.",
     "selectSpeed": "Select Speed",
     "speed": "Speed: {{value}}x",
