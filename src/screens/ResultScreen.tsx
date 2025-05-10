@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch, BackHandler, Platform, TouchableWithoutFeedback, Linking } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator, GestureResponderEvent, Modal, Pressable, Switch, BackHandler, Platform, TouchableWithoutFeedback, Linking, AccessibilityInfo } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -30,6 +30,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
   const [autoRead, setAutoRead] = useState(true);
   const [autoReadLoaded, setAutoReadLoaded] = useState(false);
   const [lastTapTime, setLastTapTime] = useState(0);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const hasSpokenRef = useRef(false);
   const { controls, panResponder, setRate } = useGestures();
   const maxRate = getMaxSpeechRate();
@@ -40,6 +41,26 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
     { value: maxRate },
   ];
   const nav = useNavigation();
+
+  // Check if screen reader is enabled
+  useEffect(() => {
+    const checkScreenReader = async () => {
+      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(isEnabled);
+    };
+
+    checkScreenReader();
+
+    // Listen for screen reader changes
+    const subscription = AccessibilityInfo.addEventListener(
+      'screenReaderChanged',
+      setIsScreenReaderEnabled
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // --- Load autoRead from storage on mount ---
   useEffect(() => {
@@ -70,15 +91,15 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       analyzeImageAndMaybeSpeak();
     } else {
       setIsStopped(false);
-      if (autoRead) trySpeak(initialDescription);
+      if (autoRead && !isScreenReaderEnabled) trySpeak(initialDescription);
       hasSpokenRef.current = true;
     }
     return () => { stopSpeech(); };
-  }, [initialDescription, autoReadLoaded]);
+  }, [initialDescription, autoReadLoaded, isScreenReaderEnabled]);
 
   // --- Update speech rate when controls change ---
   useEffect(() => {
-    if (!autoReadLoaded) return;
+    if (!autoReadLoaded || isScreenReaderEnabled) return;
     setSpeechRate(controls.rate);
     // Always replay reading at new speed if autoRead is on and description is present
     if (autoRead && description) {
@@ -88,11 +109,11 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
         hasSpokenRef.current = true;
       }, 50);
     }
-  }, [controls.rate, description, autoRead, autoReadLoaded]);
+  }, [controls.rate, description, autoRead, autoReadLoaded, isScreenReaderEnabled]);
 
   // --- React to autoRead toggle ---
   useEffect(() => {
-    if (!autoReadLoaded) return;
+    if (!autoReadLoaded || isScreenReaderEnabled) return;
     if (autoRead && description && !isLoading && !isStopped) {
       speakText(description);
       hasSpokenRef.current = true;
@@ -101,7 +122,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
       setIsStopped(true);
       hasSpokenRef.current = false;
     }
-  }, [autoRead, autoReadLoaded, description, isLoading, isStopped]);
+  }, [autoRead, autoReadLoaded, description, isLoading, isStopped, isScreenReaderEnabled]);
 
   // --- Reset hasSpokenRef when description changes ---
   useEffect(() => {
@@ -110,7 +131,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
 
   // --- Centralized speech logic ---
   const trySpeak = (text: string) => {
-    if (autoReadLoaded && autoRead) {
+    if (autoReadLoaded && autoRead && !isScreenReaderEnabled) {
       speakText(text);
     }
   };
@@ -213,41 +234,45 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ navigation, route }) => {
             >
               <Text style={styles.retakeButtonText}>{i18n.t('result.retake')}</Text>
             </TouchableOpacity>
-            <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
+            {!isScreenReaderEnabled && (
+              <Text style={styles.hint}>{i18n.t('result.doubleTapRetake')}</Text>
+            )}
           </>
         )}
       </TouchableOpacity>
       {/* Controls Row: Toggle, Stopped Text, Speed Button */}
-      <View style={styles.controlsRow}>
-        <View style={styles.controlsSide}>
-          <View style={styles.autoReadToggleContainer}>
-            <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
-            <Switch
-              value={autoRead}
-              onValueChange={(value) => {
-                trackAutoReadPreference(value);
-                setAutoRead(value);
-              }}
-              thumbColor={autoRead ? '#4caf50' : '#ccc'}
-              trackColor={{ false: '#888', true: '#a5d6a7' }}
-            />
+      {!isScreenReaderEnabled && (
+        <View style={styles.controlsRow}>
+          <View style={styles.controlsSide}>
+            <View style={styles.autoReadToggleContainer}>
+              <Text style={styles.autoReadLabel}>{i18n.t('result.autoRead')}</Text>
+              <Switch
+                value={autoRead}
+                onValueChange={(value) => {
+                  trackAutoReadPreference(value);
+                  setAutoRead(value);
+                }}
+                thumbColor={autoRead ? '#4caf50' : '#ccc'}
+                trackColor={{ false: '#888', true: '#a5d6a7' }}
+              />
+            </View>
+          </View>
+          <View style={styles.controlsCenter}>
+            {isStopped && (
+              <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
+            )}
+          </View>
+          <View style={styles.controlsSide}>
+            <TouchableOpacity
+              style={styles.speedButton}
+              onPress={() => setShowSpeedModal(true)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.controlsCenter}>
-          {isStopped && (
-            <Text style={styles.stoppedText}>{i18n.t('result.paused')}</Text>
-          )}
-        </View>
-        <View style={styles.controlsSide}>
-          <TouchableOpacity
-            style={styles.speedButton}
-            onPress={() => setShowSpeedModal(true)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.speedButtonText}>{`${i18n.t('result.speed', { value: controls.rate.toFixed(1)})}`}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      )}
       {/* Revert to single centered donate button */}
       <TouchableOpacity
         style={styles.donateButton}
